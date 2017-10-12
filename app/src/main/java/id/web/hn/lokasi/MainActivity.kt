@@ -23,40 +23,32 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         btn_lokasi.setOnClickListener {
-            cekLokasi()
+            val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            if(permission != PackageManager.PERMISSION_GRANTED){
+
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION)
+
+            } else {
+                getLokasi()
+            }
         }
     }
 
-    private fun cekLokasi() {
-
-        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-        if(permission != PackageManager.PERMISSION_GRANTED){
-
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), LOCATION_PERMISSION)
-
-        } else {
-            getLokasi()
-        }
-
-
-
-    }
-
-    fun getLokasi(){
+    private fun getLokasi(){
         fusedLocationClient.lastLocation
                 .addOnSuccessListener {
                     val lat = it?.latitude
                     val lng = it?.longitude
                     Toast.makeText(this, "lat: $lat, long: $lng", Toast.LENGTH_SHORT).show()
+                    //tuliskan ke textview:
+                    textView.text = "lat: $lat, long: $lng"
                 }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
                                             grantResults: IntArray) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when(requestCode){
             LOCATION_PERMISSION -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this, "yeay", Toast.LENGTH_SHORT).show()
                 getLokasi()
             }
             else -> Toast.makeText(this, "gagal", Toast.LENGTH_SHORT).show()
